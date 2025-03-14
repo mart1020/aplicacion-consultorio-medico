@@ -1,0 +1,707 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
+
+
+struct paciente{
+	char nombreyapellido[50];
+	int Fdia;
+	int Fmes;
+	int Fanio;
+	int dni;
+	int cuil;
+	char obraSocial[60];
+	int tel;
+	char direccion[80];
+	char diagnostico[240];
+	bool borrado;
+	
+};
+
+struct Usuario{
+	
+	int usuario;
+	int contras;
+	int rol;
+	bool borrado;
+	
+};
+
+ login(int usuario,int contr){
+	
+	int autorizar;
+	Usuario usuarioP;
+	
+	FILE* archivo;
+	
+	archivo=fopen("usuario.dat","r+b");
+	
+    fread(&usuarioP,sizeof(Usuario),1,archivo);
+    
+    while(!feof(archivo)){
+    	
+    	if(usuario==usuarioP.usuario&&contr==usuarioP.contras){
+    		
+    		printf("\n--------Ingreso concedido--------\n");
+    		
+    		autorizar=1;
+		}
+		else{
+			
+			printf("\n--------Ingreso denegado--------\n");
+			printf("\nCOMUNIQUESE CON SU ADMINISTRADOR\n");
+			printf("\n--------------------------------\n");
+			
+			autorizar=2;
+		
+		}
+		
+		fread(&usuarioP,sizeof(Usuario),1,archivo);
+	}
+	
+		fclose(archivo);
+		
+		return autorizar;
+	
+}
+
+
+
+buscarPaciente(){
+	
+	int dni,buscar;
+	
+	paciente pac;
+	
+	FILE*archivo;
+	
+	archivo=fopen("paciente.dat","r+b");
+	
+	
+	
+
+			while(!feof(archivo) && fread(&pac,sizeof(paciente),1,archivo)){
+				
+				printf("\n\n Ingrese el numero de dni del paciente a buscar: \n\n");
+				scanf("%d",&dni);
+			
+				
+				if(pac.dni==dni){
+					
+					printf("\n\n----PACIENTE ENTONTRADO----\n\n");
+					printf("DNI: %d \n",pac.dni);
+					printf("Cuil: %d \n",pac.cuil);
+					printf("Nombre y apellido: %s \n",pac.nombreyapellido);
+					printf("Fecha de nac: %d - %d - %d \n",pac.Fdia,pac.Fmes,pac.Fanio);
+					printf("Obra social: %s \n",pac.obraSocial);
+					printf("Tel: %d \n",pac.tel);
+					printf("Direccion: %s \n",pac.direccion);
+					
+				}
+				else{
+					
+					printf("\n\n----PACIENTE NO ENCONTRADO----\n\n");
+					
+				}
+			}
+			
+	
+	return buscar;
+}
+	
+	
+	
+
+ 
+ crearNuevoRegistro(){
+	
+	paciente pac;
+	FILE*archivo;
+	int n,i,crear;
+	
+	printf("\n\nIngrese la cantidad de pacientes a registrar como NUEVOS:");
+	scanf("%d",&n);
+	
+	archivo=fopen("paciente.dat","r+b");
+	
+	for(i=0;i<n;i++){
+		
+		printf("\n\n--------Ingrese los datos del paciente--------\n\n");
+		
+		printf("\n Dni: ");
+		scanf("%d",&pac.dni);
+		
+		printf("\n Cuil: ");
+		scanf("%d",&pac.cuil);
+		
+		printf("\n Telefono(sin 0 ni 15 ni +): ");
+		scanf("%d",&pac.tel);
+		
+		
+		printf("\n Fecha de Naciemiento: \ndia:");
+		scanf("%d",&pac.Fdia);
+		
+		printf("\n mes:");
+		scanf("%d",&pac.Fmes);
+		
+		printf("\n anio");
+		scanf("%d",&pac.Fanio);
+		getchar();
+		
+		_flushall();
+		
+	
+		printf("\n Nombre y apellido: ");
+		fgets(pac.nombreyapellido,50,stdin);
+		getchar();
+		
+
+		printf("\n Obra social: ");
+		fgets(pac.obraSocial,60,stdin);
+		getchar();
+		
+		printf("\n Direccion: ");
+		fgets(pac.direccion,80,stdin);
+		getchar();
+		
+		
+		pac.borrado=false;
+		
+		printf("\n\n--------PACIENTE REGISTRADO CON EXITO--------\n\n");
+		
+		
+		fwrite(&pac,sizeof(paciente),1,archivo);
+		fseek(archivop,-sizeof(paciente),SEEK_END);
+			
+	}
+	
+	fclose(archivo);
+	
+	return crear;
+}
+
+eliminarPaciente(){
+	int pacE;
+	
+	paciente pac;
+	FILE*archivo;
+	bool band;
+	int dni;
+	
+	system("CLS");
+	printf("\nIngrese el dni del paciente a eliminar:");
+	scanf("%d",&dni);
+	
+	archivo=fopen("paciente.dat","r+b");
+	fread(&pac,sizeof(paciente),1,archivo);
+	band=false;
+	
+	while(feof(archivo)==0 && band==false){
+		
+		if(pac.dni==dni && band==false){
+			
+			pac.borrado=true;
+			fseek(archivo,-sizeof(paciente),SEEK_CUR);
+			fwrite(&pac,sizeof(paciente),1,archivo);
+			
+			printf("\n\n___________________________\n\n");
+			printf("\n\n____PACIENTE ELIMINADO_____\n\n");
+			printf("\n\n___________________________\n\n");
+			
+			
+			band=true;
+			
+			
+		}
+		else{
+			
+			fread(&pac,sizeof(paciente),1,archivo);
+			
+			
+		}
+	}
+	
+	rewind(archivo);
+	fread(&pac,sizeof(paciente),1,archivo);
+	
+	while(!feof(archivo)){
+		if(pac.borrado==false){
+			
+			printf("DNI: %d \n",pac.dni);
+			printf("Cuil: %d \n",pac.cuil);
+		    printf("Nombre y apellido: %s \n",pac.nombreyapellido);
+			printf("Fecha de nac: %d - %d - %d \n",pac.Fdia,pac.Fmes,pac.Fanio);
+			printf("Obra social: %s \n",pac.obraSocial);
+			printf("Tel: %d \n",pac.tel);
+			printf("Direccion: %s \n",pac.direccion);
+		}
+		fread(&pac,sizeof(paciente),1,archivo);
+	}
+	
+	fclose(archivo);
+	
+	
+	
+	
+	return pacE;
+}
+
+modificarPaciente(){
+	
+	int pacM,dni,elegir;
+	paciente pac;
+	FILE*archivo;
+	bool band;
+	
+	system("CLS");
+	printf("\n\n____________________________________________________________\n\n");
+	printf("\n\n__________Ingrese el dni de paciente a modificar:___________\n\n");
+	printf("\n\n____________________________________________________________\n\n");
+	
+	scanf("%d",&dni);
+	archivo=fopen("paciente.dat","r+b");
+	fread(&pac,sizeof(paciente),1,archivo);
+	band=false;
+	
+	while(feof(archivo)==0 && band==false){
+	
+	
+		if(dni==pac.dni && pac.borrado==false){
+			
+			printf("\n\n____________INGRESE LA OPCION A MODIFICAR___________________\n\n");
+			printf("\n\n[1] Nombre [2]\n\n Fecha de nac\n\n [3] Cuil\n\n [4]Dni\n\n [5]Telefono\n\n [6]Direccion\n\n [7]Obra social\n\n");
+			scanf("%d",&elegir);
+			
+			
+			switch(elegir){
+			
+			case 1: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese el nuevo nombre:");
+					
+					fgets(pac.nombreyapellido,50,stdin);
+					pac.nombreyapellido[strcspn(pac.nombreyapellido, "\n")] = 0;
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					
+					break;
+					
+			case 2: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese la nueva fecha d nacimiento:");
+					printf("Dia:");
+					scanf("%d",&pac.Fdia);
+					printf("Mes:");
+					scanf("%d",&pac.Fmes);
+					printf("Anio:");
+					scanf("%d",&pac.Fanio);
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					break;
+					
+			case 3: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese el nuevo cuil :");
+					scanf("%d",&pac.cuil);
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					break;
+					
+			case 4: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese el nuevo dni :");
+					scanf("%d",&pac.dni);
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					break;
+					
+			case 5: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese el nuevo telefono :");
+					scanf("%d",&pac.tel);
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					break;
+					
+			case 6: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese el nueva direccion :");
+					fgets(pac.direccion,80,stdin);
+					pac.direccion[strcspn(pac.direccion, "\n")] = 0;
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					break;
+					
+			case 7: printf("\n\n_________________________________________________\n\n");
+					printf("\n\nIngrese el nueva obra social :");
+					fgets(pac.obraSocial,60,stdin);
+					pac.obraSocial[strcspn(pac.obraSocial, "\n")] = 0;
+					fseek(archivo,-sizeof(paciente),SEEK_CUR);
+					fwrite(&pac,sizeof(paciente),1,archivo);
+					printf("\n\n_________________________________________________\n\n");
+					printf("\n\n____________REGISTRO MODIFICADO__________________\n\n");
+					printf("\n\n_________________________________________________\n\n");
+					break;
+					
+			}
+		}
+		else{
+			fread(&pac,sizeof(paciente),1,archivo);
+			
+		}
+	
+	}
+	
+
+	
+	rewind(archivo);
+	fread(&pac,sizeof(paciente),1,archivo);
+	
+	while(!feof(archivo)){
+		if(pac.borrado==false){
+			
+					printf("DNI: %d \n",pac.dni);
+					printf("Cuil: %d \n",pac.cuil);
+					printf("Nombre y apellido: %s \n",pac.nombreyapellido);
+					printf("Fecha de nac: %d - %d - %d \n",pac.Fdia,pac.Fmes,pac.Fanio);
+					printf("Obra social: %s \n",pac.obraSocial);
+					printf("Tel: %d \n",pac.tel);
+					printf("Direccion: %s \n",pac.direccion);
+			
+		}
+		
+		fread(&pac,sizeof(paciente),1,archivo);
+		
+	}
+	
+	fclose(archivo);
+	
+	return pacM;
+}
+
+listadosPacientes(){
+	
+	int listadosP;
+	paciente pac;
+	FILE*archivo;
+	
+	archivo=fopen("paciente.dat","r+b");
+	fread(&pac,sizeof(paciente),1,archivo);
+	
+	while(!feof(archivo)){
+		
+		printf("Dni: %d",pac.dni);
+		printf("Nombre y apellido: %s",pac.nombreyapellido);
+		printf("Fecha de nacimiento %d - %d - %d: ",pac.Fdia,pac.Fmes,pac.Fanio);
+		printf("Cuil: %s",pac.cuil);
+		printf("Obra social: %s",pac.obraSocial);
+		printf("Telefono: %d",pac.tel);
+		printf("Direccion: %s",pac.direccion);
+		
+		fread(&pac,sizeof(paciente),1,archivo);
+		
+	}
+	
+	fclose(archivo);
+	
+	return listadosP;
+	
+}
+
+modificarDianostico(){
+	
+	Usuario usu;
+	
+	FILE*archivo;
+	bool band;
+	int dni,modificarD;
+	
+	system("CLS");
+	
+	archivo=fopen("usuario.dat","r+b");
+	fread(&usu,sizeof(Usuario),1,archivo);
+	band=false;
+	
+	if(usu.rol==1){
+		
+		paciente pac;
+		FILE*archivop;
+		
+		archivo=fopen("paciente.dat","a+b");
+		
+		printf("Ingrese el dni a modificar el diagnostico:");
+		scanf("%d",&dni);
+		 
+		 fread(&pac,sizeof(paciente),1,archivop); 
+		 
+		 while(feof(archivop)==0 && band==false){
+		 	
+		 	if(pac.dni==dni && pac.borrado==false){
+		 		printf("Ingrese el diagnostico:");
+		 		 
+		 		fgets(pac.diagnostico,50,stdin);
+		        pac.diagnostico[strcspn(pac.diagnostico, "\n")] = 0;
+		        
+		        fseek(archivop,-sizeof(paciente),SEEK_END);
+		        fwrite(&pac,sizeof(paciente),1,archivop);
+		        
+		        printf("____________________________________");
+		        printf("___REGISTRO AGREGADO CON EXITO______");
+		        printf("____________________________________");
+		        
+		        band=true;
+		        
+			 }
+			 
+			 else{
+			 	
+			 	printf("____________________________________");
+		        printf("___NO SE ENCUENTRA EL REGISTRO______");
+		        printf("____________________________________");
+			 	
+			 	fread(&pac,sizeof(paciente),1,archivop); 
+			 }
+			 
+		 } 
+		
+		
+		rewind(archivop);
+		fread(&pac,sizeof(paciente),1,archivop); 
+		
+		while(!feof(archivop)){
+			if(pac.borrado==false){
+				
+				printf("Dni: %d",pac.dni);
+				printf("Nombre: %s",pac.nombreyapellido);
+				printf("Diagnostco: %d",pac.diagnostico);
+				
+			}
+			fread(&pac,sizeof(paciente),1,archivop); 
+		}
+		fclose(archivop);
+		 
+	}
+	else{
+		 	
+		 		printf("____________________________________________________");
+		        printf("________Usted no posee los permisos necesarios______");
+		        printf("________para modificar el diagnostico_______________");
+		        printf("________consulte con el ADMINISTRADOR_______________");
+		
+	}
+		
+	fclose(archivo);
+		
+	return modificarD;
+}
+
+imprimirHistoriaC(){
+	
+	int dni,impr;
+	paciente pac;
+	FILE*archivo;
+	FILE*archivoImprimir;
+	
+	archivo=fopen("paciente.dat","r+b");
+	archivoImprimir=fopen("imprimir.txt","w+b");
+	
+	fread(&pac,sizeof(paciente),1,archivo);
+	
+	printf("Ingrese el dni para imprimir historia clinica:");
+	scanf("%d",&dni);
+	
+	while(!feof(archivo)){
+		
+		if(pac.dni==dni){
+			
+			printf("Nombre: %s",pac.nombreyapellido);
+			printf("Dni: %d",pac.dni);
+			printf("Cuil: %d",pac.cuil);
+			printf("Fecha de nacimiento: d% - d% - d%",pac.Fdia,pac.Fmes,pac.Fanio);
+			printf("Obra social: %s",pac.obraSocial);
+			printf("Diagnostico: %s",pac.diagnostico);
+			
+			fwrite(&pac,sizeof(paciente),1,archivoImprimir);
+			
+				printf("\n\n____________________________________________________\n\n");
+		        printf("\n\n________ARCHIVO UARDADO PARA IMPRIMIR_______________\n\n");
+		        printf("\n\n_______________imprimir.txt_________________________\n\n");
+		        printf("\n\n____________________________________________________\n\n");
+		      
+			
+		}
+		fread(&pac,sizeof(paciente),1,archivo);
+	}
+	
+	fclose(archivo);
+	fclose(archivoImprimir);
+	
+	return impr;
+}
+
+main(){
+	
+	int n,i,j,alta,contr,usuario,autorizar,opcion,buscar,crear,imprimir,lista,modificar,pacM,pacE,listadosP,modificarD;
+	int impr;
+	
+	while(n!=0){
+		
+				//MENU PRINCIPAL
+		printf("\n---------------------------------------------------------------------------------------------\n");
+		printf("\n-----------------------Bienvenido al sistema de registros de pacientes-----------------------\n");
+		printf("\n---------------------------------------------------------------------------------------------\n");
+			
+		printf("Si ya tiene usuario presione {1} de lo contrario {2}");
+		printf("\nIngrese una opcion: ");
+		
+		scanf("%d",&alta);		
+					
+					if(alta==1){
+						
+						printf("\nIngrese usuario: \n");
+							scanf("%d",&usuario);
+							
+							printf("\nIngrese contrasenia:\n");
+							scanf("%d",&contr);
+							
+							autorizar=login( usuario, contr);
+							
+					}
+					
+					if(alta==2){
+						
+						int administrador,password,pass,admin;
+						    
+							Usuario usuarioC;
+					
+							FILE *archivo= fopen("usuario.dat", "ab");
+							
+							if(archivo == NULL){
+								
+								printf ("Error al abrir el archivo.\n");
+								
+								}
+							 			
+							//CONTRASENIA ADMINISTRADOR---------------
+							admin=1234;
+							pass=1234;
+							//----------------------------------------
+							
+							
+							printf("\n----Ingrese permiso de administrador----\n");
+							
+							    printf("Usuario: \n");
+							    scanf("%d",&administrador);
+							    
+							    printf("Contrasena:\n");
+							    scanf("%d",&password);
+							    
+							if(administrador==admin && password==pass){
+				
+			    
+							    printf("Ingrese la cantidad de usuarios a crear:");
+							    scanf("%d",&j);
+								
+								archivo=fopen("usuario.dat","w+b");
+								
+									for(i=0;i<j;i++){
+										
+										printf("\nIngrese el usuario:\n");
+										scanf("%d",&usuarioC.usuario);
+										
+										printf("\n Ingrese la contrasenia:\n");
+										scanf("%d",&usuarioC.contras);
+										
+										printf("\n Ingrese el rol {1}profesional o {0}administrativo");
+										scanf("%d",&usuarioC.rol);
+										
+										printf("\n\n----Usuario creado----\n\n");
+										
+										usuarioC.borrado=false;
+										
+										fwrite(&usuarioC,sizeof(Usuario),1,archivo);
+										
+										i++;
+									
+								}
+								
+							fclose(archivo);
+							
+							
+					}
+
+	}
+	
+		if(autorizar==1){
+			
+			printf("\n---------------------------------------------------------------------------------------------\n");
+			printf("\n-----------------------Bienvenido al sistema de registros de pacientes-----------------------\n");
+			printf("\n---------------------------------------------------------------------------------------------\n");
+			
+			printf("[1]Buscar un paciente\n\n [2]Crear NUEVO registro para paciente\n\n [3]ELIMINAR O MODIFICAR paciente\n\n [4]Imprimir historia clinica\n\n [5]Listado de pacientes\n\n [6]MODIFICAR DIAGNOSTICO\n\n [7]Salir\n\n");
+			printf("\n\nIngrese una opcion: ");			
+			scanf("%d",&opcion);
+			
+			switch(opcion){
+				
+				case 1: buscar=buscarPaciente();
+						
+					
+				 break;
+				
+				case 2: crear=crearNuevoRegistro(); break;
+				
+				case 3: printf("\n\n Si desea modificar datos del paciente presione {1}\n\n Si desea eliminar paciente presione {2}\n\n");
+						scanf("%d",&modificar);
+						
+						if(modificar==1){
+				
+							pacM = modificarPaciente();
+						}
+						if(modificar==2){
+				
+							pacE =eliminarPaciente();
+				
+						}
+						break;
+				
+				case 4: impr = imprimirHistoriaC(); break;
+				
+				case 5: listadosP = listadosPacientes(); break;
+				
+				case 6: modificarD = modificarDianostico(); break;
+				
+				case 7: n=0; break;
+				
+				
+			}
+		}
+		else{
+			
+			printf("acceso denegado");
+		}
+		
+		
+	    
+	
+	
+	}
+	
+	
+}
